@@ -1,0 +1,47 @@
+{
+  "description": "Esquema del dataset maestro de eventos de seguridad - Ministerio de Defensa Colombia",
+  "version": "1.0",
+  "columns": {
+    "fecha": {
+      "type": "date",
+      "description": "Fecha del hecho (día)"
+    },
+    "ano": {
+      "type": "int16",
+      "description": "Año extraído para agregaciones"
+    },
+    "mes": {
+      "type": "int8",
+      "description": "Mes (1-12) para análisis estacional"
+    },
+    "cod_depto": {
+      "type": "string",
+      "description": "Código DIVIPOLA departamento (2 dígitos)"
+    },
+    "cod_muni": {
+      "type": "string",
+      "description": "Código DIVIPOLA municipio (5 dígitos)"
+    },
+    "departamento": {
+      "type": "string",
+      "description": "Nombre departamento normalizado"
+    },
+    "municipio": {
+      "type": "string",
+      "description": "Nombre municipio normalizado"
+    },
+    "tipo_evento": {
+      "type": "string",
+      "description": "Categoría del evento (derivada del archivo fuente)"
+    },
+    "cantidad": {
+      "type": "int32",
+      "description": "Número de víctimas/casos/cantidad"
+    },
+    "archivo_origen": {
+      "type": "string",
+      "description": "Nombre del archivo Excel de origen"
+    }
+  },
+  "required": ["fecha", "cod_depto", "cod_muni", "tipo_evento", "cantidad"]
+}

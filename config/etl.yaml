@@ -1,0 +1,67 @@
+# Configuración del Pipeline ETL - Análisis Seguridad Colombia
+# Fuente: Ministerio de Defensa - Datos de criminalidad y violencia
+
+etl:
+  # Directorio de datos de entrada
+  input:
+    base_path: "MINISTERIO DE DEFENSA"
+    extensions: [".xlsx"]
+
+  # Directorio de salida
+  output:
+    base_path: "data/processed"
+    maestro_file: "eventos_seguridad_maestro.parquet"
+    log_file: "etl_run.log"
+
+  # Archivos excluidos (resúmenes, no datos transaccionales)
+  exclude_files:
+    - "INDICADORES DE SEGUR Y RESULT OPER ENERO-DICIEMBRE 2025.xlsx"
+
+  # Mapeo de columnas origen -> destino
+  column_mappings:
+    fecha:
+      source: ["FECHA_HECHO", "FECHA HECHO"]
+      target: "fecha"
+    cod_depto:
+      source: ["COD_DEPTO"]
+      target: "cod_depto"
+    cod_muni:
+      source: ["COD_MUNI"]
+      target: "cod_muni"
+    departamento:
+      source: ["DEPARTAMENTO"]
+      target: "departamento"
+    municipio:
+      source: ["MUNICIPIO"]
+      target: "municipio"
+    valor:
+      source: ["VICTIMAS", "CANTIDAD", "CASOS", "CAPTURAS", "CANTIDAD "]
+      target: "cantidad"
+
+  # Columnas opcionales a preservar (para análisis detallado)
+  optional_columns:
+    - ZONA
+    - SEXO
+    - TIPO CULTIVO
+    - UNIDAD_MEDIDA
+    - UNIDAD DE MEDIDA
+    - UNIDADES DE MEDIDA
+    - DESCRIPCION CONDUCTA
+    - NOMBRE_FUERZA
+    - ACCION
+    - GRUPO
+    - TIPO
+    - CLASE BIEN HURTO
+    - CLASE DE BIEN
+    - CLASE BIEN
+
+  # Validación temporal
+  validation:
+    min_year: 1990
+    max_year: 2030
+    drop_future_dates: true
+
+  # Normalización geográfica (DIVIPOLA)
+  divipola:
+    cod_depto_length: [1, 2]  # 1 o 2 dígitos
+    cod_muni_length: [4, 5]   # 4 o 5 dígitos

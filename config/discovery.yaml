@@ -1,0 +1,26 @@
+# Configuración del script de descubrimiento de datos
+# 01_data_discovery.py
+
+discovery:
+  # Rutas de búsqueda (relativas al directorio del proyecto)
+  search_paths:
+    - "."
+    - "MINISTERIO DE DEFENSA"
+    - "DANE PIB"
+
+  # Extensiones de archivos a procesar
+  excel_extensions:
+    - ".xlsx"
+    - ".xls"  # Requiere: pip install xlrd
+
+  # Opciones de salida
+  output:
+    directory: "docs"
+    json: true
+    markdown: true
+
+  # Opciones de análisis
+  analysis:
+    recursive: true
+    sample_size: 5
+    max_departments_in_report: 50

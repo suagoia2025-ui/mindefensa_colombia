@@ -1,0 +1,33 @@
+# Git y IDE
+.git
+.gitignore
+.cursor
+*.md
+!README.md
+
+# Python
+__pycache__
+*.py[cod]
+*.pyo
+.venv
+venv
+.env
+*.egg-info
+.pytest_cache
+.coverage
+htmlcov
+
+# Node / frontend (solo para el contexto del backend)
+frontend/node_modules
+frontend/dist
+
+# Datos grandes (se montan por volumen; no copiar en build)
+# data/raw
+# data/processed
+# Descomenta si no quieres incluir data en la imagen:
+# data/
+
+# Carpetas de origen que no forman parte del runtime
+MINISTERIO DE DEFENSA
+DANE PIB
+docs

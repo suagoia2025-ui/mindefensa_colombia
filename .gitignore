@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+.env
+*.egg-info/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Node / frontend
+node_modules/
+frontend/dist/
+
+# Datos generados (grandes - ~700MB)
+data/processed/
+
+# Datos fuente Excel (~260MB - descomenta para versionarlos)
+MINISTERIO DE DEFENSA/
+DANE PIB/
+
+# Logs
+*.log
+
+# IDE / OS
+.DS_Store
+.idea/
+.vscode/

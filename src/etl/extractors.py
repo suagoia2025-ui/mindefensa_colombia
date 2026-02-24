@@ -13,23 +13,6 @@ import pandas as pd
 logger = logging.getLogger(__name__)
 
 
-def find_source_columns(df: pd.DataFrame, candidate_names: list[str]) -> str | None:
-    """
-    Busca la primera columna que coincida con los nombres candidatos.
-
-    Args:
-        df: DataFrame con los datos
-        candidate_names: Lista de nombres posibles (case-sensitive)
-
-    Returns:
-        Nombre de la columna encontrada o None
-    """
-    for name in candidate_names:
-        if name in df.columns:
-            return name
-    return None
-
-
 def extract_excel_file(
     file_path: Path,
     tipo_evento: str,

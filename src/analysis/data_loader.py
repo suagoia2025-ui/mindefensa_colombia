@@ -5,7 +5,6 @@ Carga del dataset maestro con filtros opcionales.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Literal
 
 import pandas as pd
 
@@ -22,10 +21,10 @@ def _resolve_maestro_path(base_path: str | Path) -> Path:
             return alt
         return base
 
-    paraquet = Path(str(base) + ".parquet")
+    parquet = Path(str(base) + ".parquet")
     csv = Path(str(base) + ".csv")
-    if paraquet.exists():
-        return paraquet
+    if parquet.exists():
+        return parquet
     if csv.exists():
         return csv
     return csv  # Default para crear

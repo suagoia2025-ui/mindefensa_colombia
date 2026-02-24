@@ -31,18 +31,3 @@ def load_etl_config(config_path: Path | None = None) -> dict[str, Any]:
         config = yaml.safe_load(f)
 
     return config.get("etl", config)
-
-
-def get_column_mappings(config: dict[str, Any]) -> dict[str, list[str]]:
-    """Extrae mapeos columna_origen -> columna_destino."""
-    mappings = config.get("column_mappings", {})
-    result: dict[str, list[str]] = {}
-    for target, spec in mappings.items():
-        if isinstance(spec, dict) and "source" in spec:
-            result[target] = spec["source"]
-    return result
-
-
-def get_excluded_files(config: dict[str, Any]) -> set[str]:
-    """Archivos a excluir del procesamiento."""
-    return set(config.get("exclude_files", []))

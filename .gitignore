@@ -21,6 +21,10 @@ data/processed/
 MINISTERIO DE DEFENSA/
 DANE PIB/
 
+# Reportes generados (regenerar con: python 01_data_discovery.py)
+docs/data_discovery_report.json
+docs/data_discovery_report.md
+
 # Logs
 *.log
 

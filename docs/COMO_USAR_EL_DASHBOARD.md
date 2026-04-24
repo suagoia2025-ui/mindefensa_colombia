@@ -24,6 +24,8 @@ Para detener: `docker compose down`.
 
 ### Opción B: Sin Docker (desarrollo local)
 
+El frontend usa **TypeScript**, **Tailwind CSS v4** (tema oscuro) y **Recharts**.
+
 ### Primera vez (instalación)
 
 1. **Asegurar que existan los datos procesados.**  
@@ -63,15 +65,15 @@ Deja esta terminal abierta. Verás una URL, normalmente: `http://localhost:5173`
 
 ## 2. Filtros
 
-En la parte superior del dashboard hay tres filtros:
+En la parte superior del dashboard hay tres filtros y el botón **Graficar**:
 
 | Filtro | Uso |
 |--------|-----|
-| **Años** | Años a analizar, separados por coma. Ejemplo: `2020,2021,2022,2023` o `2015,2020,2024`. Rango disponible en los datos: **2002 a 2025**. |
-| **Tipo de evento** | Desplegable con categorías (homicidio intencional, hurtos, violencia intrafamiliar, etc.). "Todos" = no filtrar por tipo. |
-| **Departamento** | Desplegable con departamentos. "Todos" = Colombia completo. |
+| **Años** | Casillas por año. Rango del tablero: **2002 a 2025** (el que veas en los datos depende del ETL). |
+| **Tipo de evento** | Categorías del maestro (homicidio intencional, hurtos, etc.). **«Todos»** significa que aún no eliges un tipo concreto: en ese caso **no se cargan gráficos** hasta que elijas un tipo y pulses **Graficar**. |
+| **Departamento** | Desplegable con departamentos. «Todos» = sin filtro por departamento (sí se pueden cargar gráficos si ya hay tipo de evento). |
 
-Al cambiar cualquier filtro, los gráficos se actualizan solos.
+Los gráficos **no** se actualizan solos al cambiar casillas o desplegables: debes pulsar **Graficar** para aplicar los filtros a los paneles.
 
 ---
 
@@ -80,14 +82,8 @@ Al cambiar cualquier filtro, los gráficos se actualizan solos.
 - **Serie temporal**  
   Evolución del total de eventos por año (o por período). Sirve para ver tendencias en el tiempo.
 
-- **Comparación año a año**  
-  Barras con el total por año. Útil para ver si un año sube o baja respecto al anterior.
-
 - **Top departamentos**  
   Departamentos con más casos en el período y filtros elegidos. Ordenado de mayor a menor.
-
-- **Top tipos de evento**  
-  Tipos de delito/evento con más registros. Permite ver qué categorías dominan.
 
 - **Concentración territorial**  
   Índice Gini (0 = muy repartido, 1 = muy concentrado) y barras de % acumulado por departamento. Muestra si los eventos se concentran en pocos departamentos.
@@ -103,12 +99,15 @@ Al cambiar cualquier filtro, los gráficos se actualizan solos.
   Descarga un archivo CSV con los datos que estás viendo según los filtros actuales (hasta 100.000 filas).  
   Úsalo para analizar en Excel o en otro programa.
 
+- **Enlace en la cabecera** («Descarga los dataset en excel»)  
+  Abre el portal del Ministerio de Defensa con la información estadística y descargas oficiales en Excel.
+
 ---
 
 ## 5. Consejos rápidos
 
-- Para comparar varios años: pon en **Años** algo como `2018,2019,2020,2021,2022`.
-- Para un solo tipo de delito: elige ese tipo en **Tipo de evento** y deja **Departamento** en "Todos" para ver el país.
+- Para comparar varios años: marca las casillas de los años que te interesen y pulsa **Graficar**.
+- Para un solo tipo de delito: elige ese tipo en **Tipo de evento** y deja **Departamento** en «Todos» para ver el país, luego **Graficar**.
 - Para un departamento: elige el departamento y, si quieres, restringe también el **Tipo de evento**.
 - El año **2025** puede estar incompleto; para “año completo” usa hasta **2024**.
 

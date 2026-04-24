@@ -6,21 +6,22 @@ Sistema de análisis de datos del Ministerio de Defensa de Colombia para evaluar
 ## Estructura del Proyecto
 
 ```
+├── config/               # YAML de ETL y unidades (p. ej. etl.yaml)
 ├── data/
 │   ├── raw/              # Archivos Excel originales sin modificar
 │   ├── processed/        # Datos procesados y normalizados
 │   └── schemas/          # Definición de estructuras de datos
 ├── src/
-│   ├── etl/              # Scripts de extracción, transformación y carga
+│   ├── etl/              # Extracción, transformación y carga
 │   ├── analysis/         # Módulos de análisis estadístico
-│   ├── visualization/    # Generación de gráficos y reportes
+│   ├── config/           # Unidades por tipo de evento (Python)
 │   └── api/              # Backend API (FastAPI)
-├── frontend/             # Dashboard React
-├── notebooks/            # Jupyter notebooks para exploración
-├── tests/                # Tests unitarios y de integración
+├── frontend/             # Dashboard React + Vite
 ├── docs/                 # Documentación y reportes generados
-├── config/               # Archivos de configuración
-└── 01_data_discovery.py  # Script de descubrimiento de datos
+├── 01_data_discovery.py
+├── 02_run_etl.py
+├── 03_run_analysis.py
+└── run_dashboard.py
 ```
 
 ## Instalación
@@ -76,7 +77,7 @@ Ver `docs/ANALISIS_MODULO_DISEÑO.md` para diseño.
 
 ## Dashboard interactivo
 
-Dashboard web con React + FastAPI.
+Dashboard web con **React 19 + Vite 7 + TypeScript + Tailwind CSS v4** (tema oscuro, paleta copper) y **Recharts**. Backend **FastAPI + Pandas**.
 
 ```bash
 # Terminal 1: Backend API
@@ -90,7 +91,7 @@ npm run dev
 
 Abrir **http://localhost:5173**
 
-**Funcionalidades:** Serie temporal, comparación año a año, top departamentos/tipos, concentración (Gini), estacionalidad. Filtros por año (2002–2025), tipo de evento y departamento. Exportar CSV.
+**Funcionalidades:** Serie temporal, top departamentos, concentración (Gini), estacionalidad. Filtros por año (2002–2025), tipo de evento y departamento; hay que elegir un **tipo de evento concreto** y pulsar **Graficar** (con «Todos» los gráficos permanecen vacíos). Exportar CSV. En la cabecera hay enlace a los datos oficiales en Excel del MinDefensa.
 
 **Instrucciones de uso:** Ver [docs/COMO_USAR_EL_DASHBOARD.md](docs/COMO_USAR_EL_DASHBOARD.md).
 

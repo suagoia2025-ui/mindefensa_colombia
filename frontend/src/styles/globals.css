@@ -1,0 +1,110 @@
+@import 'tailwindcss';
+
+@theme {
+  /* Copper */
+  --color-copper-light: #e8956d;
+  --color-copper: #c87941;
+  --color-copper-rich: #b5622a;
+  --color-copper-deep: #8b4513;
+
+  /* Fondos (superficies) */
+  --color-surface-void: #0d0b0a;
+  --color-surface-obsidian: #141210;
+  --color-surface-charcoal: #1c1915;
+  --color-surface-graphite: #252118;
+  --color-surface-smoke: #322d25;
+
+  /* Texto cálido */
+  --color-warm-white: #f2ede6;
+  --color-warm-cream: #d4c9b8;
+  --color-warm-stone: #8c7e6e;
+  --color-warm-ash: #4a4238;
+
+  /* Acentos */
+  --color-accent-gold: #d4a853;
+  --color-accent-bronze: #6b4c2a;
+  --color-accent-steelblue: #3a4a5c;
+  --color-accent-teal: #2a4a48;
+
+  /* Tipografía (Google Fonts en index.html) */
+  --font-display: 'Bebas Neue', ui-sans-serif, system-ui, sans-serif;
+  --font-body: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
+}
+
+@layer base {
+  :root {
+    --gradient-copper: linear-gradient(135deg, #e8956d, #c87941, #b5622a, #8b4513);
+    /* Recharts: una sola fuente de verdad en CSS (no hex en JSX) */
+    --chart-line-primary: #e8956d;
+    --chart-bar-2: #b5622a;
+    --chart-bar-4: #3a4a5c;
+    --chart-bar-5: #2a4a48;
+    --chart-grid: #4a4238;
+    --chart-axis: #8c7e6e;
+    --tooltip-bg: #252118;
+    --tooltip-border: #322d25;
+    --tooltip-text: #f2ede6;
+  }
+
+  html {
+    @apply antialiased;
+  }
+
+  body {
+    @apply bg-surface-void text-warm-white font-body min-h-screen;
+  }
+}
+
+@layer components {
+  .gradient-copper-text {
+    background: var(--gradient-copper);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .card-dashboard {
+    @apply min-w-0 rounded-xl border border-surface-smoke bg-surface-charcoal p-5 shadow-lg transition-colors duration-200;
+  }
+
+  .card-dashboard:hover {
+    @apply bg-surface-graphite;
+  }
+
+  .btn-primary {
+    background: var(--gradient-copper);
+    @apply rounded-lg px-5 py-2.5 font-semibold text-surface-void shadow-md transition-opacity;
+  }
+
+  .btn-primary:hover:not(:disabled) {
+    @apply opacity-90;
+  }
+
+  .btn-primary:disabled {
+    @apply cursor-not-allowed opacity-40;
+  }
+
+  .btn-ghost {
+    @apply rounded-lg border border-surface-smoke bg-transparent px-4 py-2 text-sm text-warm-cream underline-offset-2 hover:text-copper-light;
+  }
+
+  .btn-export {
+    @apply inline-block rounded-lg border border-accent-gold bg-accent-bronze px-4 py-2 text-sm font-medium text-warm-white no-underline transition-opacity hover:opacity-90;
+  }
+
+  .filter-shell {
+    @apply rounded-xl border border-surface-smoke bg-surface-obsidian p-5;
+  }
+
+  .input-dark {
+    @apply rounded-lg border border-surface-smoke bg-surface-graphite px-3 py-2 text-sm text-warm-white placeholder:text-warm-stone focus:border-copper focus:outline-none focus:ring-1 focus:ring-copper;
+  }
+
+  .label-dark {
+    @apply text-xs font-semibold uppercase tracking-wide text-warm-stone;
+  }
+
+  .skeleton-pulse {
+    @apply animate-pulse rounded-lg bg-surface-graphite;
+  }
+}

@@ -68,7 +68,32 @@ En GitHub: **Settings → Secrets and variables → Actions → New repository s
 
 ## URL de demo (portafolio)
 
-- Actualizar con tu IP o dominio cuando quede estable.
+Marcador en README y aquí: **`TU_ELASTIC_IP`** → reemplazar por tu IPv4 (ej. la Elastic IP asociada a la instancia).
+
+| Recurso | URL |
+|---------|-----|
+| Dashboard | `http://TU_ELASTIC_IP/` |
+| Metadatos | `http://TU_ELASTIC_IP/api/metadata` |
+| Salud | `http://TU_ELASTIC_IP/api/health` |
+
+### Tras asignar Elastic IP
+
+Ejecutar en orden (sustituir `TU_ELASTIC_IP` por tu IPv4 real en cada sitio):
+
+1. **AWS Console → EC2 → Instances:** anotar **Public IPv4 address** (debe coincidir con la Elastic IP asociada).
+2. **Mac — SSH:** en `~/.ssh/config`, bloque `Host seguridad-colombia`, poner `HostName TU_ELASTIC_IP`.
+3. **GitHub — Secrets:** editar `EC2_HOST` → valor `TU_ELASTIC_IP` (solo dígitos y puntos, sin `http://`).
+4. **EC2 — CORS:** en el servidor:
+   ```bash
+   cd ~/apps/analisis-seguridad/mindefensa_colombia
+   nano .env.production
+   ```
+   En `ALLOWED_ORIGINS` incluir al menos `http://TU_ELASTIC_IP` y `http://localhost`. Guardar y aplicar:
+   ```bash
+   docker compose -f docker-compose.prod.yml up -d
+   ```
+5. **Repo — documentación:** buscar y reemplazar en `README.md` y en este archivo el texto `TU_ELASTIC_IP` por tu IP (o dejar el marcador si prefieres no publicar la IP en Git).
+6. **Comprobar:** abrir en el navegador `http://TU_ELASTIC_IP/` y `http://TU_ELASTIC_IP/api/health`.
 
 ## Checklist (resumen)
 

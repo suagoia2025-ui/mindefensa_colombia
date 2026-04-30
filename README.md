@@ -114,6 +114,16 @@ La carpeta `data/` se monta como volumen; el backend lee `data/processed/eventos
 
 **Producción (EC2 / demo):** guía de arquitectura, `docker-compose.prod.yml`, variables y checklist en [docs/deployment.md](docs/deployment.md). En el servidor: copiar `.env.production.example` a `.env.production` y ajustar `ALLOWED_ORIGINS`.
 
+**Demo pública (Elastic IP):** en los archivos del repo sustituye el marcador `TU_ELASTIC_IP` por la **IPv4 pública** que muestra EC2 (sin `http://` en los comandos; sí en las URLs).
+
+| Recurso | URL |
+|---------|-----|
+| Dashboard | `http://TU_ELASTIC_IP/` |
+| Metadatos API | `http://TU_ELASTIC_IP/api/metadata` |
+| Salud API | `http://TU_ELASTIC_IP/api/health` |
+
+Pasos para dejar todo alineado con la IP: ver [docs/deployment.md](docs/deployment.md) → sección **Tras asignar Elastic IP**.
+
 ---
 
 ## Uso del Script de Descubrimiento

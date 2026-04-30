@@ -36,17 +36,39 @@ Documento generado según `deploy_prompt.md` (Fase 0). Actualizar la **URL de de
 ## Comandos rápidos (servidor)
 
 ```bash
-cd ~/apps/analisis-seguridad
-cp .env.production.example .env.production   # y editar ALLOWED_ORIGINS / rutas
+cd ~/apps/analisis-seguridad/mindefensa_colombia
+cp .env.production.example .env.production   # y editar ALLOWED_ORIGINS
 docker compose -f docker-compose.prod.yml build
 docker compose -f docker-compose.prod.yml up -d
-curl -s http://localhost/api/health
+curl -s http://127.0.0.1/api/health
 ```
+
+## CI/CD (GitHub Actions)
+
+Workflow: `.github/workflows/deploy.yml`. Se ejecuta en **push** a `master` o `main` (y manualmente con **Run workflow**).
+
+### Secrets del repositorio
+
+En GitHub: **Settings → Secrets and variables → Actions → New repository secret**.
+
+| Secret | Valor ejemplo |
+|--------|----------------|
+| `EC2_HOST` | IP pública o Elastic IP (ej. `75.101.193.108`) |
+| `EC2_USER` | `ubuntu` |
+| `EC2_SSH_KEY` | Contenido completo de la clave **privada** que usa Actions para entrar al servidor (ver abajo) |
+| `EC2_WORK_DIR` | Ruta absoluta del repo en EC2: `/home/ubuntu/apps/analisis-seguridad/mindefensa_colombia` |
+
+**Clave SSH para CI:** no reutilices tu `.pem` personal en el secret si puedes evitarlo. Opción recomendada: en el servidor generar un par solo para GitHub (`ssh-keygen`), añadir la **pública** a `~/.ssh/authorized_keys` y guardar la **privada** en `EC2_SSH_KEY`. Así revocas CI sin tocar tu acceso habitual.
+
+### Comprobar en EC2 antes del primer deploy
+
+- El directorio `EC2_WORK_DIR` es un clone **git** del mismo repo (puede hacer `git pull`).
+- Existe `.env.production` (no va en Git).
+- Están los datos en `data/processed/eventos_seguridad_maestro.parquet`.
 
 ## URL de demo (portafolio)
 
-- **Pendiente:** `http://<ELASTIC_IP>` o `https://<dominio>`
-- Actualizar esta sección y el README cuando el despliegue esté completo.
+- Actualizar con tu IP o dominio cuando quede estable.
 
 ## Checklist (resumen)
 

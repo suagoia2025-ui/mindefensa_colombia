@@ -136,14 +136,24 @@ def root():
     return {"status": "ok", "api": "análisis-seguridad-colombia"}
 
 
-@app.get("/health")
-async def health_check():
-    """Salud del servicio (Docker healthcheck, nginx → /api/health)."""
+def _health_payload() -> dict[str, str]:
     return {
         "status": "healthy",
         "service": "analisis-seguridad-colombia",
         "version": "1.0.0",
     }
+
+
+@app.get("/health")
+async def health_check():
+    """Salud del servicio (Docker healthcheck directo al contenedor API)."""
+    return _health_payload()
+
+
+@app.get("/api/health")
+async def api_health_check():
+    """Misma respuesta vía prefijo /api (nginx expone /api/* al cliente)."""
+    return _health_payload()
 
 
 @app.get("/api")

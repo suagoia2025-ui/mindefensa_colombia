@@ -1,11 +1,12 @@
-# Despliegue a EC2 vía SSH. Requiere secrets: EC2_HOST, EC2_USER, EC2_SSH_KEY, EC2_WORK_DIR
-# Ver docs/deployment.md y deploy_prompt.md (Fase 11).
+# Despliegue a EC2 vía SSH. Secrets: EC2_HOST, EC2_USER, EC2_SSH_KEY, EC2_WORK_DIR
+# Ver docs/deployment.md (sección CI/CD).
 
 name: Deploy — Analisis Seguridad Colombia
 
 on:
   push:
     branches:
+      - master
       - main
     paths-ignore:
       - "docs/**"
@@ -55,7 +56,8 @@ jobs:
     needs: validate
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    if: github.ref == 'refs/heads/main'
+    if: |
+      github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main'
 
     steps:
       - name: Deploy via SSH
@@ -69,14 +71,15 @@ jobs:
           command_timeout: 15m
           script: |
             set -e
-            echo "Deploy — $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            BRANCH="${{ github.ref_name }}"
+            echo "Deploy rama=$BRANCH — $(date -u +%Y-%m-%dT%H:%M:%SZ)"
             cd "${{ secrets.EC2_WORK_DIR }}"
-            git fetch origin main
-            git reset --hard origin/main
+            git fetch origin "$BRANCH"
+            git reset --hard "origin/$BRANCH"
             docker compose -f docker-compose.prod.yml build
             docker compose -f docker-compose.prod.yml up -d --remove-orphans
-            sleep 15
-            curl -fsS "http://127.0.0.1/api/health" | head -c 200
+            sleep 20
+            curl -fsS "http://127.0.0.1/api/health" | head -c 300
             echo ""
             docker compose -f docker-compose.prod.yml ps
             docker image prune -f
@@ -93,7 +96,7 @@ jobs:
           if [ "${{ needs.deploy.result }}" = "success" ]; then
             echo "DEPLOY OK — ${{ github.sha }}"
           elif [ "${{ needs.deploy.result }}" = "skipped" ]; then
-            echo "Deploy omitido (no rama main u otra condición)"
+            echo "Deploy omitido (rama distinta de master/main)"
           else
             echo "DEPLOY FALLO — revisar Actions (el job deploy ya falló)"
           fi

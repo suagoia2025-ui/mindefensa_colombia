@@ -1,0 +1,99 @@
+# Despliegue a EC2 vía SSH. Requiere secrets: EC2_HOST, EC2_USER, EC2_SSH_KEY, EC2_WORK_DIR
+# Ver docs/deployment.md y deploy_prompt.md (Fase 11).
+
+name: Deploy — Analisis Seguridad Colombia
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - "docs/**"
+      - "**.md"
+      - ".gitignore"
+
+  workflow_dispatch:
+
+env:
+  COMPOSE_FILE: docker-compose.prod.yml
+
+jobs:
+  validate:
+    name: Validate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Preparar .env.production para validar compose
+        run: cp .env.production.example .env.production
+
+      - name: Validar docker-compose.prod.yml
+        run: |
+          docker compose -f docker-compose.prod.yml config --quiet
+          echo "OK: docker-compose.prod.yml"
+
+      - name: Verificar archivos requeridos
+        run: |
+          set -e
+          for f in \
+            docker-compose.prod.yml \
+            Dockerfile.api \
+            frontend/Dockerfile.frontend \
+            nginx/nginx.conf \
+            src/api/main.py
+          do
+            if [ ! -f "$f" ]; then
+              echo "Falta: $f"
+              exit 1
+            fi
+          done
+          echo "OK: archivos presentes"
+
+  deploy:
+    name: Deploy to EC2
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          port: 22
+          script_stop: true
+          command_timeout: 15m
+          script: |
+            set -e
+            echo "Deploy — $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            cd "${{ secrets.EC2_WORK_DIR }}"
+            git fetch origin main
+            git reset --hard origin/main
+            docker compose -f docker-compose.prod.yml build
+            docker compose -f docker-compose.prod.yml up -d --remove-orphans
+            sleep 15
+            curl -fsS "http://127.0.0.1/api/health" | head -c 200
+            echo ""
+            docker compose -f docker-compose.prod.yml ps
+            docker image prune -f
+            echo "OK — http://${{ secrets.EC2_HOST }}/api/health"
+
+  notify:
+    name: Notify
+    needs: [validate, deploy]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Resultado
+        run: |
+          if [ "${{ needs.deploy.result }}" = "success" ]; then
+            echo "DEPLOY OK — ${{ github.sha }}"
+          elif [ "${{ needs.deploy.result }}" = "skipped" ]; then
+            echo "Deploy omitido (no rama main u otra condición)"
+          else
+            echo "DEPLOY FALLO — revisar Actions (el job deploy ya falló)"
+          fi

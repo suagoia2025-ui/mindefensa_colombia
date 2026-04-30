@@ -112,6 +112,8 @@ docker compose up --build
 
 La carpeta `data/` se monta como volumen; el backend lee `data/processed/eventos_seguridad_maestro.csv` (o .parquet). Detener: `docker compose down`.
 
+**Producción (EC2 / demo):** guía de arquitectura, `docker-compose.prod.yml`, variables y checklist en [docs/deployment.md](docs/deployment.md). En el servidor: copiar `.env.production.example` a `.env.production` y ajustar `ALLOWED_ORIGINS`.
+
 ---
 
 ## Uso del Script de Descubrimiento

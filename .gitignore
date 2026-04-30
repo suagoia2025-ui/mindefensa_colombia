@@ -32,3 +32,16 @@ docs/data_discovery_report.md
 .DS_Store
 .idea/
 .vscode/
+
+# Producción (no versionar credenciales ni entornos locales)
+.env.production
+.env.local
+*.local.env
+
+# Datos en EC2 (parquet sueltos; processed/ ya estaba ignorado)
+data/parquet/
+logs/
+certbot/conf/*
+!certbot/conf/.gitkeep
+
+deploy_prompt.md

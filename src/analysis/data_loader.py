@@ -4,6 +4,7 @@ Carga del dataset maestro con filtros opcionales.
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
 import pandas as pd
@@ -54,9 +55,13 @@ def load_maestro(
         departamento, municipio, tipo_evento, cantidad, archivo_origen
     """
     if path is None:
-        if project_root is None:
-            project_root = Path(__file__).resolve().parents[2]
-        path = project_root / "data" / "processed" / "eventos_seguridad_maestro"
+        env_maestro = os.environ.get("EVENTOS_MAESTRO_PATH")
+        if env_maestro and str(env_maestro).strip():
+            path = Path(env_maestro.strip())
+        else:
+            if project_root is None:
+                project_root = Path(__file__).resolve().parents[2]
+            path = project_root / "data" / "processed" / "eventos_seguridad_maestro"
 
     file_path = _resolve_maestro_path(path)
 

@@ -6,6 +6,7 @@ Endpoints para consumo del frontend React.
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
 from typing import Any
 
@@ -41,9 +42,15 @@ app = FastAPI(
     version="1.0.0",
 )
 
+_allowed = os.environ.get("ALLOWED_ORIGINS", "*").strip()
+if _allowed == "*":
+    _cors_origins = ["*"]
+else:
+    _cors_origins = [o.strip() for o in _allowed.split(",") if o.strip()]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=_cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -127,6 +134,16 @@ def _get_df(
 def root():
     """Health check."""
     return {"status": "ok", "api": "análisis-seguridad-colombia"}
+
+
+@app.get("/health")
+async def health_check():
+    """Salud del servicio (Docker healthcheck, nginx → /api/health)."""
+    return {
+        "status": "healthy",
+        "service": "analisis-seguridad-colombia",
+        "version": "1.0.0",
+    }
 
 
 @app.get("/api")

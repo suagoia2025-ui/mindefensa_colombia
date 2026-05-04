@@ -13,7 +13,7 @@ import pandas as pd
 
 from src.etl.config import load_etl_config
 from src.etl.extractors import extract_all_files
-from src.etl.loaders import save_etl_log, save_maestro_parquet
+from src.etl.loaders import save_etl_log, save_maestro_parquet, save_partitions_and_catalog
 from src.etl.transformers import transform_dataframe
 
 logging.basicConfig(
@@ -112,6 +112,13 @@ def run_pipeline(
     logger.info("Fase 4: Carga")
     output_path = save_maestro_parquet(maestro_df, maestro_file)
 
+    logger.info("Fase 4b: Particiones por indicador (tipo_evento) y catálogo")
+    catalog_path: Path | None = None
+    try:
+        catalog_path = save_partitions_and_catalog(maestro_df, output_base)
+    except Exception as e:
+        logger.warning("Particiones/catálogo no generados: %s", e)
+
     # Log
     duration = (datetime.now() - start_time).total_seconds()
     summary = {
@@ -120,6 +127,7 @@ def run_pipeline(
         "files_processed": len(all_dfs),
         "total_records": total_records,
         "output_file": str(output_path),
+        "catalog_file": str(catalog_path) if catalog_path else None,
         "duration_seconds": round(duration, 2),
         "records_per_event_type": records_per_file,
     }

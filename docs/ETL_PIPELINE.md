@@ -41,6 +41,15 @@ MINISTERIO DE DEFENSA/*.xlsx
 | `cantidad`       | int32  | Víctimas/casos/cantidad                  |
 | `archivo_origen` | string | Archivo Excel de origen                  |
 
+Tras el maestro, el ETL también genera (si hay PyArrow):
+
+- `data/processed/partitions/<hash>.parquet` — un archivo por `tipo_evento` (indicador).
+- `data/processed/catalog.json` — años, departamentos, lista de tipos y rutas; la API lo usa para `/api/metadata` y carga perezosa por indicador.
+
+Si ya tienes solo el maestro y quieres particiones sin re-leer Excel:
+
+`python scripts/rebuild_partitions.py`
+
 ## Uso
 
 ```bash

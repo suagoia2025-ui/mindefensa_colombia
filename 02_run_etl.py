@@ -53,6 +53,8 @@ def main() -> int:
         print(f"Total registros: {summary.get('total_records', 0):,}")
         print(f"Duración: {summary.get('duration_seconds', 0)} segundos")
         print(f"Archivo salida: {summary.get('output_file', 'N/A')}")
+        if summary.get("catalog_file"):
+            print(f"Catálogo / particiones: {summary.get('catalog_file')}")
 
         if summary.get("status") == "error":
             return 1

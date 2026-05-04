@@ -4,6 +4,8 @@ Loaders - Escritura del dataset maestro en Parquet.
 
 from __future__ import annotations
 
+import hashlib
+import json
 import logging
 from pathlib import Path
 from typing import Any
@@ -110,6 +112,66 @@ def save_maestro_parquet(
             "Se requiere pyarrow o fastparquet para Parquet. "
             "Instale con: pip install pyarrow"
         )
+
+
+def save_partitions_and_catalog(
+    df: pd.DataFrame,
+    processed_dir: Path,
+) -> Path | None:
+    """
+    Escribe un Parquet por tipo_evento y un catalog.json para carga rápida en API.
+
+    - Particiones: data/processed/partitions/<hash>.parquet
+    - Catálogo: data/processed/catalog.json
+    """
+    if not _has_parquet_engine():
+        logger.warning("Sin motor Parquet: se omite partición por indicador y catalog.json")
+        return None
+
+    processed_dir = Path(processed_dir)
+    partitions_dir = processed_dir / "partitions"
+    partitions_dir.mkdir(parents=True, exist_ok=True)
+
+    df = ensure_correct_dtypes(df)
+    tipos_payload: list[dict[str, Any]] = []
+
+    for tipo_evento, grupo in df.groupby("tipo_evento", sort=False):
+        label = str(tipo_evento)
+        digest = hashlib.sha256(label.encode("utf-8")).hexdigest()[:16]
+        fname = f"{digest}.parquet"
+        rel_file = f"partitions/{fname}"
+        out_file = partitions_dir / fname
+        grupo.to_parquet(out_file, index=False)
+        anos = sorted(grupo["ano"].unique().astype(int).tolist())
+        tipos_payload.append(
+            {
+                "tipo_evento": label,
+                "file": rel_file,
+                "rows": int(len(grupo)),
+                "cantidad_total": int(grupo["cantidad"].sum()),
+                "anos": anos,
+            }
+        )
+
+    catalog = {
+        "version": 1,
+        "partitions_dir": "partitions",
+        "anos_disponibles": sorted(df["ano"].unique().astype(int).tolist()),
+        "departamentos": sorted(df["departamento"].dropna().unique().tolist()),
+        "total_registros": int(len(df)),
+        "tipos": tipos_payload,
+    }
+
+    catalog_path = processed_dir / "catalog.json"
+    with open(catalog_path, "w", encoding="utf-8") as fh:
+        json.dump(catalog, fh, ensure_ascii=False, indent=2)
+
+    logger.info(
+        "Particiones por tipo_evento: %d archivos + catalog.json en %s",
+        len(tipos_payload),
+        catalog_path,
+    )
+    return catalog_path
 
 
 def save_etl_log(

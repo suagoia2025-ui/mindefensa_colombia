@@ -54,9 +54,12 @@ python 02_run_etl.py
 
 - **Entrada**: `MINISTERIO DE DEFENSA/*.xlsx` (excluye INDICADORES)
 - **Salida**: `data/processed/eventos_seguridad_maestro.parquet` (o .csv si no hay pyarrow)
+- **Además (con PyArrow)**: `data/processed/partitions/*.parquet` por indicador y `data/processed/catalog.json` para carga rápida en la API
 - **Resultado**: ~7.4M registros normalizados con esquema unificado
 
 Para formato Parquet: `pip install pyarrow`
+
+Si ya tienes el maestro y solo faltan particiones + catálogo: `python scripts/rebuild_partitions.py`
 
 Ver `docs/ETL_PIPELINE.md` para diseño detallado.
 

@@ -13,6 +13,7 @@ from typing import Any
 import math
 from io import BytesIO
 
+import pandas as pd
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse, JSONResponse
@@ -35,6 +36,12 @@ from src.analysis import (
     patron_mensual,
 )
 from src.config import get_unidad_por_tipo_evento
+from src.analysis.partition_catalog import (
+    catalog_ready,
+    get_dataframe_for_tipo_evento,
+    load_catalog,
+    tipo_evento_to_file,
+)
 
 app = FastAPI(
     title="Análisis Seguridad Colombia",
@@ -115,8 +122,27 @@ def _get_df(
     tipo_evento: str | None = None,
     departamento: str | None = None,
 ):
-    """Obtiene dataset con filtros aplicados sobre el dataset en caché (sin copiar todo)."""
-    df = _get_cached_full_df()
+    """
+    Dataset filtrado. Si existe catalog.json y se pide un tipo_evento, carga solo esa partición
+    (rápido). Si no, usa el maestro completo en caché.
+    """
+    df: pd.DataFrame
+    if tipo_evento is not None and catalog_ready(PROJECT_ROOT):
+        cat = load_catalog(PROJECT_ROOT)
+        if cat and tipo_evento_to_file(cat, tipo_evento):
+            try:
+                df = get_dataframe_for_tipo_evento(PROJECT_ROOT, tipo_evento)
+            except Exception:
+                df = _get_cached_full_df()
+                df = df[df["tipo_evento"] == tipo_evento]
+        else:
+            df = _get_cached_full_df()
+            df = df[df["tipo_evento"] == tipo_evento]
+    else:
+        df = _get_cached_full_df()
+        if tipo_evento is not None:
+            df = df[df["tipo_evento"] == tipo_evento]
+
     if anos is not None:
         df = df[df["ano"].isin(anos)]
     if departamento is not None:
@@ -125,8 +151,6 @@ def _get_df(
             | df["departamento"].str.upper().str.strip().eq(str(departamento).upper())
         )
         df = df[mask]
-    if tipo_evento is not None:
-        df = df[df["tipo_evento"] == tipo_evento]
     return df.reset_index(drop=True)
 
 
@@ -165,6 +189,17 @@ def api_root():
 @app.get("/api/metadata")
 def metadata():
     """Metadatos del dataset (años disponibles, tipos de evento, unidades)."""
+    cat = load_catalog(PROJECT_ROOT)
+    if cat:
+        tipos = sorted(t["tipo_evento"] for t in cat.get("tipos", []))
+        unidades = {t: get_unidad_por_tipo_evento(t) for t in tipos}
+        return {
+            "anos_disponibles": cat["anos_disponibles"],
+            "tipos_evento": tipos,
+            "unidades_tipo_evento": unidades,
+            "departamentos": cat["departamentos"],
+            "total_registros": cat["total_registros"],
+        }
     df = _get_cached_full_df()
     tipos = sorted(df["tipo_evento"].unique().tolist())
     unidades = {t: get_unidad_por_tipo_evento(t) for t in tipos}
